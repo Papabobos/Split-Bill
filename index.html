@@ -87,7 +87,7 @@ input{
   cursor:pointer;
 }
 
-/* ===== STICKY ===== */
+/* sticky */
 .sticky-bar{
   position:fixed;
   bottom:0;
@@ -149,6 +149,7 @@ input{
 </div>
 
 <div id="result"></div>
+
 <div id="shareBtn" class="share" onclick="shareWA()" style="display:none">
   Share ke WhatsApp 🚀
 </div>
@@ -156,7 +157,6 @@ input{
 </div>
 </div>
 
-<!-- STICKY -->
 <div class="sticky-bar">
   <button class="btn blue" onclick="hitung()">Hitung</button>
   <button class="btn pink" onclick="resetAll()">Reset</button>
@@ -164,6 +164,7 @@ input{
 
 <script>
 
+// ===== DATA =====
 let people=[{name:'',price:''}];
 let extras=[];
 
@@ -187,7 +188,8 @@ function render(){
       <input value="${p.name||''}" placeholder="Nama"
         onchange="people[${i}].name=this.value">
       <input value="${p.price||''}" placeholder="Harga"
-        inputmode="numeric" oninput="formatRupiah(this);people[${i}].price=this.value">
+        inputmode="numeric"
+        oninput="formatRupiah(this);people[${i}].price=this.value">
       <button onclick="removePerson(${i})">x</button>
     </div>`;
   });
@@ -200,7 +202,8 @@ function render(){
       <input value="${e.label||''}" placeholder="Keterangan"
         onchange="extras[${i}].label=this.value">
       <input value="${e.amount||''}" placeholder="Rp"
-        inputmode="numeric" oninput="formatRupiah(this);extras[${i}].amount=this.value">
+        inputmode="numeric"
+        oninput="formatRupiah(this);extras[${i}].amount=this.value">
       <button onclick="removeExtra(${i})">x</button>
     </div>`;
   });
@@ -224,7 +227,7 @@ function hitung(){
   const extraTotal=extras.reduce((s,e)=>s+getNumber(e.amount),0);
   const grand=subtotal+taxTotal+extraTotal;
 
-  let html=`<div class="result">Total: Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
+  let html=`<div id="hasil" class="result">Total: Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
 
   if(kasir){
     const diff=Math.abs(grand-kasir);
@@ -233,9 +236,10 @@ function hitung(){
       : `<div class="badge warn">⚠️ Selisih Rp ${diff.toLocaleString('id-ID')}</div>`;
   }
 
-  let msg=`🍽️ Split Bill\n`;
+  let msg=`🍽️ *Split Bill*\n`;
   msg+=`${document.getElementById('tempat').value||'-'}\n`;
-  msg+=`${document.getElementById('tanggal').value||'-'}\n\n`;
+  msg+=`${document.getElementById('tanggal').value||'-'}\n`;
+  msg+=`────────────────\n\n`;
 
   people.forEach(p=>{
     const price=getNumber(p.price);
@@ -254,16 +258,32 @@ function hitung(){
       <b>Total: Rp ${Math.round(total).toLocaleString('id-ID')}</b>
     </div>`;
 
-    msg+=`${p.name||'-'}\nRp ${Math.round(total).toLocaleString('id-ID')}\n\n`;
+    msg+=`👤 *${p.name||'-'}*\n`;
+    msg+=`Bayar: Rp ${price.toLocaleString('id-ID')}\n`;
+    msg+=`Pajak: Rp ${Math.round(myTax).toLocaleString('id-ID')}\n`;
+    msg+=`Lain: Rp ${Math.round(myExtra).toLocaleString('id-ID')}\n`;
+    msg+=`➡️ *Total: Rp ${Math.round(total).toLocaleString('id-ID')}*\n\n`;
   });
 
-  msg+=`TOTAL: Rp ${Math.round(grand).toLocaleString('id-ID')}\n`;
-  msg+=`\nCuss langsung transfer ke yang tadi nalangin dulu ya gaesss!`;
+  msg+=`────────────────\n`;
+  msg+=`Subtotal: Rp ${Math.round(subtotal).toLocaleString('id-ID')}\n`;
+  msg+=`Pajak: Rp ${Math.round(taxTotal).toLocaleString('id-ID')}\n`;
+  msg+=`Lain-lain: Rp ${Math.round(extraTotal).toLocaleString('id-ID')}\n`;
+  msg+=`*GRAND TOTAL: Rp ${Math.round(grand).toLocaleString('id-ID')}*\n\n`;
+  msg+=`Cuss langsung transfer ke yang tadi nalangin dulu ya gaesss!`;
 
   document.getElementById('result').innerHTML=html;
   document.getElementById('shareBtn').style.display='block';
 
   window.msg=msg;
+
+  // AUTO SCROLL
+  setTimeout(()=>{
+    document.getElementById('hasil').scrollIntoView({
+      behavior:'smooth',
+      block:'start'
+    });
+  },100);
 }
 
 // ===== SHARE =====
