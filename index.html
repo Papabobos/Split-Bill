@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Split Bill" />
+  <meta name="description" content="Biar gak ada yang kabur duluan sebelum bayar" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>Split Bill</title>
+  <style>
+    :root {
+      --bg: #f5f4f0;
+      --surface: #ffffff;
+      --surface2: #f0ede8;
+      --text: #111111;
+      --text2: #666666;
+      --text3: #999999;
+      --border: rgba(0,0,0,0.10);
+      --border2: rgba(0,0,0,0.18);
+      --green: #25D366;
+      --green-bg: #e1f5ee;
+      --green-text: #085041;
+      --warn-bg: #faeeda;
+      --warn-text: #633806;
+      --err-bg: #fcebeb;
+      --err-text: #791f1f;
+      --radius: 14px;
+      --radius-sm: 9px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111111;
+        --surface: #1e1e1e;
+        --surface2: #2a2a2a;
+        --text: #f0ede8;
+        --text2: #999999;
+        --text3: #666666;
+        --border: rgba(255,255,255,0.10);
+        --border2: rgba(255,255,255,0.18);
+        --green-bg: #0a2e1e;
+        --green-text: #5dcaa5;
+        --warn-bg: #2e1f05;
+        --warn-text: #fac775;
+        --err-bg: #2e0a0a;
+        --err-text: #f09595;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif; }
+    body { padding-top: var(--safe-top); }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--bg);
+      padding: 16px 20px 12px;
+      border-bottom: 0.5px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .topbar h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+    .topbar p { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+    .content { padding: 16px 16px calc(100px + var(--safe-bottom)); max-width: 520px; margin: 0 auto; }
+
+    .card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .card-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      color: var(--text3); text-transform: uppercase; margin-bottom: 12px;
+    }
+
+    .bill-wrap { position: relative; }
+    .bill-wrap .prefix {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 15px; color: var(--text2); pointer-events: none; font-weight: 500;
+    }
+    .bill-input {
+      width: 100%; padding: 14px 14px 14px 44px;
+      font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
+      background: var(--surface2); border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      outline: none; -webkit-appearance: none;
+    }
+    .bill-input:focus { border-color: var(--border2); }
+    .bill-hint { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+    .setting-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .setting-row:last-child { margin-bottom: 0; }
+    .setting-row > label { font-size: 14px; color: var(--text2); flex: 1; }
+    .setting-row input[type="number"] { width: 80px; }
+    .val-badge { font-size: 13px; font-weight: 600; color: var(--text); min-width: 42px; text-align: right; }
+
+    .split-col { display: flex; flex-direction: column; gap: 8px; }
+    .split-col > label { font-size: 14px; color: var(--text2); }
+    .split-toggle { display: flex; background: var(--surface2); border-radius: var(--radius-sm); padding: 3px; gap: 3px; }
+    .split-toggle button {
+      flex: 1; padding: 7px 10px; font-size: 13px; font-weight: 500;
+      background: transparent; border: none; border-radius: calc(var(--radius-sm) - 3px);
+      color: var(--text2); cursor: pointer; transition: all 0.15s;
+    }
+    .split-toggle button.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .split-desc { font-size: 12px; color: var(--text3); padding: 8px 10px; background: var(--surface2); border-radius: var(--radius-sm); }
+
+    input[type="text"], input[type="number"] {
+      background: var(--surface2); border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      padding: 10px 12px; font-size: 14px; outline: none;
+      -webkit-appearance: none; width: 100%;
+    }
+    input[type="text"]:focus, input[type="number"]:focus { border-color: var(--border2); }
+    input::placeholder { color: var(--text3); }
+
+    .person-entry, .extra-row {
+      display: flex; gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    .person-entry input:first-child, .extra-row input:first-child { flex: 2; }
+    .person-entry input:nth-child(2), .extra-row input:nth-child(2) { flex: 1; }
+
+    .del-btn {
+      width: 34px; height: 34px; min-width: 34px;
+      border: 0.5px solid var(--border2); border-radius: var(--radius-sm);
+      background: transparent; color: var(--text2); cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .del-btn:active { background: var(--surface2); }
+
+    .add-btn {
+      width: 100%; margin-top: 4px; padding: 10px;
+      border: 0.5px dashed var(--border2); border-radius: var(--radius-sm);
+      background: transparent; color: var(--text2); cursor: pointer;
+      font-size: 14px; transition: background 0.15s;
+    }
+    .add-btn:active { background: var(--surface2); }
+
+    .error { font-size: 12px; color: #e24b4a; margin-top: 6px; }
+
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      padding: 12px 16px; padding-bottom: calc(12px + var(--safe-bottom));
+      background: var(--bg);
+      border-top: 0.5px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex; gap: 8px; max-width: 520px; margin: 0 auto;
+    }
+    .calc-btn {
+      flex: 1; padding: 14px;
+      background: var(--text); color: var(--bg);
+      border: none; border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s; letter-spacing: -0.2px;
+    }
+    .calc-btn:active { opacity: 0.8; }
+    .reset-btn {
+      padding: 14px 16px;
+      background: var(--surface); color: var(--text2);
+      border: 0.5px solid var(--border2); border-radius: var(--radius-sm);
+      font-size: 14px; cursor: pointer; transition: background 0.15s;
+    }
+    .reset-btn:active { background: var(--surface2); }
+
+    .result-section { margin-top: 4px; }
+    .result-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .summary-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .summary-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+    .summary-value { font-size: 15px; font-weight: 600; color: var(--text); }
+    .summary-value.big { font-size: 18px; letter-spacing: -0.3px; }
+
+    .match-banner {
+      border-radius: var(--radius-sm); padding: 10px 14px;
+      margin-bottom: 14px; font-size: 13px; font-weight: 500;
+    }
+    .match-banner.ok { background: var(--green-bg); color: var(--green-text); }
+    .match-banner.warn { background: var(--warn-bg); color: var(--warn-text); }
+    .match-banner.err { background: var(--err-bg); color: var(--err-text); }
+
+    .divider { height: 0.5px; background: var(--border); margin: 12px 0; }
+
+    .person-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 0; border-bottom: 0.5px solid var(--border);
+    }
+    .person-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .person-info { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+    }
+    .person-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .person-base { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .person-total { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+
+    .wa-btn {
+      width: 100%; padding: 14px;
+      background: var(--green); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity 0.15s; letter-spacing: -0.2px;
+    }
+    .wa-btn:active { opacity: 0.85; }
+    .result-note { font-size: 11px; color: var(--text3); text-align: center; margin-bottom: 10px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Split Bill, gasss!</h1>
+  <p>Biar gak ada yang kabur duluan sebelum bayar</p>
+</div>
+
+<div class="content">
+
+  <div class="card">
+    <div class="card-label">Total di struk kasir berapa?</div>
+    <div class="bill-wrap">
+      <span class="prefix">Rp</span>
+      <input class="bill-input" type="number" id="bill-total" placeholder="0" min="0" inputmode="numeric" />
+    </div>
+    <div class="bill-hint">Isi dulu biar bisa dicek pas di akhir — cocok apa kagak</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Atur dulu yuk</div>
+    <div class="setting-row">
+      <label>Pajak / service charge</label>
+      <input type="number" id="tax-input" value="10" min="0" max="100" step="0.5" oninput="updateTax()" inputmode="decimal" />
+      <span class="val-badge" id="tax-label">10%</span>
+    </div>
+    <div class="split-col">
+      <label>Biaya tambahan dibaginya gimana?</label>
+      <div class="split-toggle" id="global-split-toggle">
+        <button class="active" onclick="setGlobalSplit(this,'rata')">Rata aja</button>
+        <button onclick="setGlobalSplit(this,'prop')">Proporsional</button>
+      </div>
+      <div class="split-desc" id="split-desc">Semua orang bayar sama rata, fair and square!</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Siapa bayar berapa?</div>
+    <div id="person-list">
+      <div class="person-entry">
+        <input type="text" placeholder="Nama temen" inputmode="text" autocomplete="off" />
+        <input type="number" placeholder="Harga (Rp)" min="0" inputmode="numeric" />
+        <button class="del-btn" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addRow()">+ tambahin orang lagi</button>
+    <div id="entry-error" class="error hidden"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Ada biaya lain-lain?</div>
+    <div id="extra-list"></div>
+    <button class="add-btn" onclick="addExtra()">+ tambahin (parkir, tip, dll)</button>
+  </div>
+
+  <div id="result-section" class="result-section hidden">
+    <div class="result-card">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <div class="summary-label">Total makan</div>
+          <div class="summary-value" id="r-subtotal">Rp 0</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Pajaknya</div>
+          <div class="summary-value" id="r-tax">Rp 0</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Biaya lain-lain</div>
+          <div class="summary-value" id="r-extra">Rp 0</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Total wajib lunas</div>
+          <div class="summary-value big" id="r-grand">Rp 0</div>
+        </div>
+      </div>
+      <div id="match-banner" class="match-banner hidden"></div>
+      <div class="divider"></div>
+      <div id="person-results"></div>
+    </div>
+    <p class="result-note" id="result-note"></p>
+    <button class="wa-btn" onclick="shareWA()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Kirim ke WhatsApp grup, gas!
+    </button>
+  </div>
+
+</div>
+
+<div class="bottom-bar">
+  <button class="calc-btn" onclick="calculate()">Hitung sekarang!</button>
+  <button class="reset-btn" onclick="resetAll()">Mulai ulang</button>
+</div>
+
+<script>
+const avatarColors = [
+  { bg: '#dbeafe', text: '#1e40af' },
+  { bg: '#d1fae5', text: '#065f46' },
+  { bg: '#fef3c7', text: '#92400e' },
+  { bg: '#ede9fe', text: '#5b21b6' },
+  { bg: '#fee2e2', text: '#991b1b' },
+  { bg: '#fce7f3', text: '#9d174d' },
+  { bg: '#d1fae5', text: '#065f46' },
+];
+
+let globalSplitMode = 'rata';
+let lastResult = null;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+}
+
+function updateTax() {
+  const v = parseFloat(document.getElementById('tax-input').value) || 0;
+  document.getElementById('tax-label').textContent = v.toFixed(1) + '%';
+}
+
+function setGlobalSplit(btn, mode) {
+  globalSplitMode = mode;
+  document.getElementById('global-split-toggle').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('split-desc').textContent = mode === 'rata'
+    ? 'Semua orang bayar sama rata, fair and square!'
+    : 'Yang makannya mahal, ya bayar lebih — no debat!';
+}
+
+function addRow() {
+  const div = document.createElement('div');
+  div.className = 'person-entry';
+  div.innerHTML = `<input type="text" placeholder="Nama temen" inputmode="text" autocomplete="off" /><input type="number" placeholder="Harga (Rp)" min="0" inputmode="numeric" /><button class="del-btn" onclick="removeRow(this)">×</button>`;
+  document.getElementById('person-list').appendChild(div);
+}
+
+function removeRow(btn) {
+  if (document.querySelectorAll('.person-entry').length <= 1) return;
+  btn.closest('.person-entry').remove();
+}
+
+function addExtra() {
+  const div = document.createElement('div');
+  div.className = 'extra-row';
+  div.innerHTML = `<input type="text" placeholder="Biaya apa? (mis. parkir)" inputmode="text" autocomplete="off" /><input type="number" placeholder="Berapa? (Rp)" min="0" inputmode="numeric" /><button class="del-btn" onclick="this.closest('.extra-row').remove()">×</button>`;
+  document.getElementById('extra-list').appendChild(div);
+}
+
+function fmt(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+function getInitials(name) { return name.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2); }
+
+function resetAll() {
+  document.getElementById('bill-total').value = '';
+  document.getElementById('person-list').innerHTML = `<div class="person-entry"><input type="text" placeholder="Nama temen" inputmode="text" autocomplete="off" /><input type="number" placeholder="Harga (Rp)" min="0" inputmode="numeric" /><button class="del-btn" onclick="removeRow(this)">×</button></div>`;
+  document.getElementById('extra-list').innerHTML = '';
+  document.getElementById('tax-input').value = 10;
+  document.getElementById('tax-label').textContent = '10%';
+  document.getElementById('entry-error').classList.add('hidden');
+  document.getElementById('result-section').classList.add('hidden');
+  globalSplitMode = 'rata';
+  document.getElementById('global-split-toggle').querySelectorAll('button').forEach((b, i) => i === 0 ? b.classList.add('active') : b.classList.remove('active'));
+  document.getElementById('split-desc').textContent = 'Semua orang bayar sama rata, fair and square!';
+  lastResult = null;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function calculate() {
+  const errEl = document.getElementById('entry-error');
+  errEl.classList.add('hidden');
+  const people = [];
+  let hasError = false;
+  document.querySelectorAll('.person-entry').forEach(row => {
+    const name = row.querySelector('input[type="text"]').value.trim();
+    const price = parseFloat(row.querySelector('input[type="number"]').value);
+    if (!name || isNaN(price) || price < 0) { hasError = true; return; }
+    people.push({ name, price });
+  });
+  if (hasError || people.length === 0) {
+    errEl.textContent = 'Eh, ada yang belum keisi nih — cek lagi nama sama harganya ya!';
+    errEl.classList.remove('hidden');
+    return;
+  }
+
+  const taxPct = parseFloat(document.getElementById('tax-input').value) || 0;
+  const subtotal = people.reduce((s, p) => s + p.price, 0);
+  const taxTotal = subtotal * (taxPct / 100);
+  let extraTotal = 0;
+  const extras = [];
+  document.querySelectorAll('.extra-row').forEach(row => {
+    const label = row.querySelector('input[type="text"]').value.trim() || 'Biaya lain';
+    const amount = parseFloat(row.querySelector('input[type="number"]').value) || 0;
+    if (amount > 0) { extras.push({ label, amount }); extraTotal += amount; }
+  });
+  const grandTotal = subtotal + taxTotal + extraTotal;
+  const billFromKasir = parseFloat(document.getElementById('bill-total').value) || 0;
+
+  document.getElementById('r-subtotal').textContent = fmt(subtotal);
+  document.getElementById('r-tax').textContent = fmt(taxTotal);
+  document.getElementById('r-extra').textContent = fmt(extraTotal);
+  document.getElementById('r-grand').textContent = fmt(grandTotal);
+
+  const banner = document.getElementById('match-banner');
+  if (billFromKasir > 0) {
+    const diff = Math.abs(grandTotal - billFromKasir);
+    const pct = (diff / billFromKasir) * 100;
+    banner.classList.remove('hidden', 'ok', 'warn', 'err');
+    if (diff < 500) {
+      banner.className = 'match-banner ok';
+      banner.textContent = 'Cocok sama struk kasir! Aman, gak ada yang nyolong';
+    } else if (pct < 5) {
+      banner.className = 'match-banner warn';
+      banner.textContent = `Selisih ${fmt(diff)} dari struk — cek lagi ada yang kelewat gak?`;
+    } else {
+      banner.className = 'match-banner err';
+      banner.textContent = `Waduh, beda ${fmt(diff)} dari struk kasir! Ada yang salah input nih`;
+    }
+  } else {
+    banner.classList.add('hidden');
+  }
+
+  const resultsEl = document.getElementById('person-results');
+  resultsEl.innerHTML = '';
+  const computed = people.map((p, i) => {
+    const prop = subtotal > 0 ? p.price / subtotal : 1 / people.length;
+    const myTax = taxTotal * prop;
+    let myExtra = 0;
+    extras.forEach(e => { myExtra += globalSplitMode === 'rata' ? e.amount / people.length : e.amount * prop; });
+    return { name: p.name, price: p.price, myTax, myExtra, myTotal: p.price + myTax + myExtra, i };
+  });
+  lastResult = { computed, subtotal, taxTotal, extraTotal, grandTotal, taxPct, extras, billFromKasir };
+
+  computed.forEach(c => {
+    const color = avatarColors[c.i % avatarColors.length];
+    const breakdown = ['Makan ' + fmt(c.price)];
+    if (c.myTax > 0) breakdown.push('Pajak ' + fmt(c.myTax));
+    if (c.myExtra > 0) breakdown.push('Lain-lain ' + fmt(c.myExtra));
+    const div = document.createElement('div');
+    div.className = 'person-row';
+    div.innerHTML = `<div class="person-info"><div class="avatar" style="background:${color.bg};color:${color.text};">${getInitials(c.name)}</div><div><div class="person-name">${c.name}</div><div class="person-base">${breakdown.join(' · ')}</div></div></div><div class="person-total">${fmt(c.myTotal)}</div>`;
+    resultsEl.appendChild(div);
+  });
+
+  const modeText = globalSplitMode === 'rata' ? 'rata' : 'proporsional';
+  document.getElementById('result-note').textContent = `Pajak proporsional · Biaya lain dibagi ${modeText} · gak ada yang bisa kabur!`;
+  document.getElementById('result-section').classList.remove('hidden');
+  setTimeout(() => document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function shareWA() {
+  if (!lastResult) return;
+  const { computed, subtotal, taxTotal, extraTotal, grandTotal, taxPct, billFromKasir } = lastResult;
+  let msg = '🍽️ *Split Bill — siapa bayar berapa nih!*\n─────────────────\n';
+  computed.forEach(c => {
+    msg += `\n👤 *${c.name}*\n   Makan: ${fmt(c.price)}\n`;
+    if (c.myTax > 0) msg += `   Pajak (${taxPct}%): ${fmt(c.myTax)}\n`;
+    if (c.myExtra > 0) msg += `   Lain-lain: ${fmt(c.myExtra)}\n`;
+    msg += `   ➡️ *Wajib bayar: ${fmt(c.myTotal)}*\n`;
+  });
+  msg += `\n─────────────────\nTotal makan: ${fmt(subtotal)}\n`;
+  if (taxTotal > 0) msg += `Pajak: ${fmt(taxTotal)}\n`;
+  if (extraTotal > 0) msg += `Lain-lain: ${fmt(extraTotal)}\n`;
+  msg += `*GRAND TOTAL: ${fmt(grandTotal)}*\n`;
+  if (billFromKasir > 0) {
+    const diff = Math.abs(grandTotal - billFromKasir);
+    msg += diff < 500 ? '\nStruk kasir: cocok!\n' : `\nStruk kasir: ${fmt(billFromKasir)} (selisih ${fmt(diff)})\n`;
+  }
+  msg += '\n_gak ada yang boleh kabur ya bestie!_';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+</script>
+</body>
+</html>
