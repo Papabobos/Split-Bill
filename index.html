@@ -1,9 +1,28 @@
 <style>
+  .action-row {
+  display: flex;
+  gap: 10px;
+}
+
+.action-row button {
+  flex: 1;
+}
   body {margin: 0;background: #fff;}
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap');
 
 *{box-sizing:border-box;margin:0;padding:0}
-.app {font-family: 'DM Sans', sans-serif;width: 100%;min-height: 100vh;background: var(--color-background-primary)}
+.app {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+}
+
+@media (min-width: 768px) {
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+}
 .hero{background:#1B4FFF;padding:22px 20px 26px;border-radius:0 0 28px 28px;margin-bottom:20px;position:relative;overflow:hidden}
 .hero-blob{position:absolute;top:-30px;right:-30px;width:130px;height:130px;background:#FF3FA4;border-radius:50%;opacity:0.25}
 .hero-blob2{position:absolute;bottom:-40px;left:10px;width:90px;height:90px;background:#FF3FA4;border-radius:50%;opacity:0.15}
@@ -12,7 +31,17 @@
 .hero-appname span{color:#FF3FA4}
 .hero-sub{font-size:13px;color:rgba(255,255,255,0.7);font-weight:400;line-height:1.4}
 
-.content {padding: 0 16px;padding-bottom: 2rem;width: 100%;max-width: none;margin: 0;}
+.content {
+  width: 100%;
+  padding: 0 16px 2rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 480px) {
+  .content {
+    max-width: 480px;
+  }
+}
 
 .section{margin-bottom:14px}
 .section-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--color-text-secondary);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
