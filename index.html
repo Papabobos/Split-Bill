@@ -1,168 +1,370 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SplitBill</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@400;500&display=swap');
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      background: #fff;
-    }
+*{box-sizing:border-box;margin:0;padding:0}
+.app{font-family:'DM Sans',sans-serif;max-width:420px;margin:0 auto;padding:0 0 2rem;background:var(--color-background-primary)}
 
-    * {
-      box-sizing: border-box;
-    }
+.hero{background:#1B4FFF;padding:22px 20px 26px;border-radius:0 0 28px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero-blob{position:absolute;top:-30px;right:-30px;width:130px;height:130px;background:#FF3FA4;border-radius:50%;opacity:0.25}
+.hero-blob2{position:absolute;bottom:-40px;left:10px;width:90px;height:90px;background:#FF3FA4;border-radius:50%;opacity:0.15}
+.hero-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.15);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;margin-bottom:10px;letter-spacing:0.08em;text-transform:uppercase;font-family:'Syne',sans-serif}
+.hero-appname{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:#fff;letter-spacing:-1.5px;line-height:1;margin-bottom:10px}
+.hero-appname span{color:#FF3FA4}
+.hero-sub{font-size:13px;color:rgba(255,255,255,0.7);font-weight:400;line-height:1.4}
 
-    .app {
-      width: 100%;
-      min-height: 100vh;
-      background: #fff;
-      font-family: 'DM Sans', sans-serif;
-    }
+.content{padding:0 16px;max-width:420px;margin:0 auto;padding-bottom:2rem}
 
-    .hero {
-      background: #1B4FFF;
-      padding: 22px 20px 26px;
-      border-radius: 0 0 28px 28px;
-      color: #fff;
-    }
+.section{margin-bottom:14px}
+.section-label{font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--color-text-secondary);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.section-label::before{content:'';display:block;width:3px;height:12px;border-radius:2px;background:#1B4FFF}
 
-    .hero-appname {
-      font-family: 'Syne', sans-serif;
-      font-size: 40px;
-      font-weight: 800;
-    }
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:18px;overflow:hidden}
 
-    .hero-appname span {
-      color: #FF3FA4;
-    }
+.kasir-inner{padding:16px}
+.kasir-prefix{font-size:11px;font-weight:600;color:var(--color-text-secondary);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;font-family:'Syne',sans-serif}
+.kasir-wrap{display:flex;align-items:center;gap:6px}
+.kasir-rp{font-size:18px;font-weight:600;color:var(--color-text-secondary)}
+.kasir-input{flex:1;font-size:28px;font-weight:800;color:var(--color-text-primary);background:transparent;border:none;outline:none;min-width:0;letter-spacing:-1px;font-family:'Syne',sans-serif}
+.kasir-hint{font-size:11px;color:var(--color-text-tertiary);margin-top:8px}
 
-    .hero-sub {
-      font-size: 13px;
-      opacity: 0.8;
-    }
+.setting-inner{padding:4px 16px}
+.setting-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.setting-row:last-child{border-bottom:none}
+.setting-row>label{font-size:14px;color:var(--color-text-primary);flex:1}
+.tax-right{display:flex;align-items:center;gap:8px}
+.tax-num{width:60px;font-size:14px;padding:6px 8px;border-radius:10px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;text-align:center;font-family:'DM Sans',sans-serif}
+.tax-num:focus{border-color:#1B4FFF}
+.tax-val{font-size:14px;font-weight:700;color:#1B4FFF;min-width:34px;text-align:right;font-family:'Syne',sans-serif}
 
-    .content {
-      width: 100%;
-      padding: 16px;
-    }
+.seg{display:flex;background:var(--color-background-secondary);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;padding:7px 8px;font-size:12px;font-weight:600;background:transparent;border:none;border-radius:10px;color:var(--color-text-secondary);cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif}
+.seg button.on{background:#1B4FFF;color:#fff}
+.split-hint{font-size:12px;color:var(--color-text-secondary);padding:8px 10px;background:var(--color-background-secondary);border-radius:10px;line-height:1.5;margin-top:6px}
 
-    .section {
-      margin-bottom: 16px;
-    }
+.person-list{padding:10px 16px 4px}
+.person-entry{display:flex;gap:7px;align-items:center;margin-bottom:9px}
+.p-num{width:22px;height:22px;min-width:22px;border-radius:50%;background:#EEF2FF;color:#1B4FFF;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Syne',sans-serif}
 
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+input[type="text"],input[type="number"]{font-size:14px;padding:9px 12px;border-radius:12px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;-webkit-appearance:none;width:100%;font-family:'DM Sans',sans-serif}
+input[type="text"]:focus,input[type="number"]:focus{border-color:#1B4FFF}
+input::placeholder{color:var(--color-text-tertiary)}
+.p-name{flex:2}
+.p-price{flex:1;text-align:right}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ddd;
-    }
+.del-btn{width:30px;height:30px;min-width:30px;border:0.5px solid var(--color-border-secondary);border-radius:9px;background:transparent;color:var(--color-text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all 0.15s}
+.del-btn:hover{background:#FFF0F7;color:#FF3FA4;border-color:#FF3FA4}
 
-    .action-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
+.add-btn{width:100%;margin:2px 0 10px;padding:10px;border:0.5px dashed var(--color-border-secondary);border-radius:12px;background:transparent;color:#1B4FFF;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background 0.15s;font-family:'DM Sans',sans-serif}
+.add-btn:hover{background:#EEF2FF}
 
-    .action-row button {
-      flex: 1;
-      padding: 14px;
-      border-radius: 14px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.extra-list{padding:10px 16px 4px}
+.extra-row{display:flex;gap:7px;align-items:center;margin-bottom:9px}
+.extra-icon{width:26px;height:26px;min-width:26px;border-radius:8px;background:#FFF0F7;color:#FF3FA4;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.e-name{flex:2}
+.e-price{flex:1;text-align:right}
+.e-name:focus,.e-price:focus{border-color:#FF3FA4!important}
 
-    .btn-hitung {
-      background: #1B4FFF;
-      color: #fff;
-    }
+.split-section{padding:12px 16px;border-top:0.5px solid var(--color-border-tertiary)}
+.split-section-label{font-size:13px;color:var(--color-text-primary);font-weight:500;margin-bottom:8px}
 
-    .btn-reset {
-      background: #FF3FA4;
-      color: #fff;
-    }
+.err{font-size:12px;color:#e11d48;padding:2px 16px 10px}
 
-    /* Desktop biar tetap rapi */
-    @media (min-width: 768px) {
-      .content {
-        max-width: 480px;
-        margin: 0 auto;
-      }
-    }
-  </style>
-</head>
+.action-row{display:flex;gap:10px;margin-bottom:20px}
+.btn-hitung{flex:1;padding:15px;background:#1B4FFF;color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-0.2px;transition:opacity 0.15s;font-family:'Syne',sans-serif}
+.btn-hitung:hover{opacity:0.88}
+.btn-pink{flex:1;padding:15px;background:#FF3FA4;color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity 0.15s;font-family:'Syne',sans-serif}
+.btn-pink:hover{opacity:0.88}
+.btn-reset{padding:15px 16px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary);border-radius:16px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
 
-<body>
+.result-header{background:#1B4FFF;border-radius:20px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden}
+.rh-blob{position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:#FF3FA4;border-radius:50%;opacity:0.3}
+.result-header-label{font-size:10px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;font-family:'Syne',sans-serif;font-weight:700;position:relative}
+.result-grand{font-size:34px;font-weight:800;color:#fff;letter-spacing:-1.5px;font-family:'Syne',sans-serif;position:relative}
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;position:relative}
+.stat-pill{background:rgba(255,255,255,0.15);border-radius:12px;padding:9px 8px;text-align:center}
+.stat-pill .sl{font-size:10px;color:rgba(255,255,255,0.65);margin-bottom:3px;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:0.05em}
+.stat-pill .sv{font-size:12px;font-weight:700;color:#fff;font-family:'Syne',sans-serif}
+
+.match-banner{border-radius:14px;padding:11px 14px;margin-bottom:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px}
+.match-banner.ok{background:#E1F5EE;color:#085041}
+.match-banner.warn{background:#FAEEDA;color:#633806}
+.match-banner.err{background:#FCEBEB;color:#791F1F}
+
+.people-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:18px;overflow:hidden;margin-bottom:12px}
+.people-card-header{padding:12px 16px;font-size:10px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:0.1em;border-bottom:0.5px solid var(--color-border-tertiary);font-family:'Syne',sans-serif}
+.p-result-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.p-result-row:last-child{border-bottom:none}
+.p-result-left{display:flex;align-items:center;gap:10px}
+.p-avatar{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;font-family:'Syne',sans-serif}
+.p-result-name{font-size:15px;font-weight:600;color:var(--color-text-primary);font-family:'Syne',sans-serif}
+.p-result-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px;line-height:1.4}
+.p-result-total{font-size:15px;font-weight:800;color:#1B4FFF;font-family:'Syne',sans-serif}
+
+.wa-btn{width:100%;padding:15px;background:#25D366;color:#fff;border:none;border-radius:16px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;transition:opacity 0.15s;font-family:'Syne',sans-serif}
+.wa-btn:hover{opacity:0.88}
+.result-note{font-size:11px;color:var(--color-text-tertiary);text-align:center;padding:0 8px;line-height:1.5}
+
+.hidden{display:none!important}
+</style>
 
 <div class="app">
-
   <div class="hero">
+    <div class="hero-blob"></div>
+    <div class="hero-blob2"></div>
+    <div class="hero-tag">App</div>
     <div class="hero-appname">Split<span>Bill</span></div>
-    <div class="hero-sub">
-      Gasss, hitung tagihan bareng!<br>
-      Biar gak ada yang kabur duluan
-    </div>
+    <div class="hero-sub">Gasss, hitung tagihan bareng!<br>Biar gak ada yang kabur duluan</div>
   </div>
 
   <div class="content">
 
     <div class="section">
-      <div class="section-label">Total Struk</div>
-      <input type="number" placeholder="Masukkan total" id="total">
+      <div class="section-label">Total struk kasir</div>
+      <div class="card">
+        <div class="kasir-inner">
+          <div class="kasir-prefix">Berapa total di struk?</div>
+          <div class="kasir-wrap">
+            <span class="kasir-rp">Rp</span>
+            <input class="kasir-input" type="number" id="bill-total" placeholder="0" min="0" />
+          </div>
+          <div class="kasir-hint">Isi dulu — nanti dicek cocok gak sama hasil hitungan</div>
+        </div>
+      </div>
     </div>
 
     <div class="section">
-      <div class="section-label">Nama</div>
-      <input type="text" placeholder="Nama teman" id="name">
+      <div class="section-label">Pengaturan</div>
+      <div class="card">
+        <div class="setting-inner">
+          <div class="setting-row">
+            <label>Pajak / service charge</label>
+            <div class="tax-right">
+              <input class="tax-num" type="number" id="tax-input" value="11" min="0" max="100" step="0.5" oninput="updateTax()" />
+              <span class="tax-val" id="tax-label">11%</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="section">
-      <div class="section-label">Harga</div>
-      <input type="number" placeholder="Harga" id="price">
+      <div class="section-label">Siapa bayar berapa?</div>
+      <div class="card">
+        <div class="person-list" id="person-list">
+          <div class="person-entry">
+            <div class="p-num">1</div>
+            <input class="p-name" type="text" placeholder="Nama temen" autocomplete="off" />
+            <input class="p-price" type="number" placeholder="Harga" min="0" />
+            <button class="del-btn" onclick="removeRow(this)">×</button>
+          </div>
+        </div>
+        <div style="padding:0 16px">
+          <button class="add-btn" onclick="addRow()">+ tambahin orang lagi</button>
+        </div>
+        <div id="entry-error" class="err hidden"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Biaya lain-lain</div>
+      <div class="card">
+        <div class="extra-list" id="extra-list"></div>
+        <div style="padding:0 16px">
+          <button class="add-btn" style="color:#FF3FA4" onclick="addExtra()">+ parkir, tip, dll</button>
+        </div>
+        <div class="split-section">
+          <div class="split-section-label">Biaya tambahan dibaginya gimana?</div>
+          <div class="seg" id="split-toggle">
+            <button class="on" onclick="setSplit(this,'rata')">Rata aja</button>
+            <button onclick="setSplit(this,'prop')">Proporsional</button>
+          </div>
+          <div class="split-hint" id="split-hint">Semua orang bayar sama rata, fair and square!</div>
+        </div>
+      </div>
     </div>
 
     <div class="action-row">
-      <button class="btn-hitung" onclick="hitung()">Hitung</button>
-      <button class="btn-reset" onclick="resetForm()">Reset</button>
+      <button class="btn-hitung" onclick="calculate()">Hitung!</button>
+      <button class="btn-pink" onclick="resetAll()">Reset</button>
     </div>
 
-    <h2 id="result"></h2>
+    <div id="result-section" class="hidden">
+      <div class="result-header">
+        <div class="rh-blob"></div>
+        <div class="result-header-label">Total yang harus lunas</div>
+        <div class="result-grand" id="r-grand">Rp 0</div>
+        <div class="result-stats">
+          <div class="stat-pill"><div class="sl">Makan</div><div class="sv" id="r-subtotal">Rp 0</div></div>
+          <div class="stat-pill"><div class="sl">Pajak</div><div class="sv" id="r-tax">Rp 0</div></div>
+          <div class="stat-pill"><div class="sl">Lain-lain</div><div class="sv" id="r-extra">Rp 0</div></div>
+        </div>
+      </div>
+
+      <div id="match-banner" class="match-banner hidden"></div>
+
+      <div class="people-card">
+        <div class="people-card-header">Rincian per orang</div>
+        <div id="person-results"></div>
+      </div>
+
+      <button class="wa-btn" onclick="shareWA()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Kirim ke WhatsApp grup, gas!
+      </button>
+      <div class="result-note" id="result-note"></div>
+    </div>
 
   </div>
-
 </div>
 
 <script>
-function hitung() {
-  const total = parseFloat(document.getElementById('total').value) || 0;
-  const price = parseFloat(document.getElementById('price').value) || 0;
+const AVATARS=[
+  {bg:'#EEF2FF',c:'#1B4FFF'},{bg:'#FFF0F7',c:'#FF3FA4'},
+  {bg:'#E1F5EE',c:'#0F6E56'},{bg:'#FAEEDA',c:'#854F0B'},
+  {bg:'#EEEDFE',c:'#534AB7'},{bg:'#FAECE7',c:'#993C1D'},
+  {bg:'#EAF3DE',c:'#3B6D11'}
+];
+let splitMode='rata',lastResult=null;
 
-  const result = total - price;
-
-  document.getElementById('result').innerText = 
-    "Sisa: Rp " + result.toLocaleString("id-ID");
+function updateTax(){
+  const v=parseFloat(document.getElementById('tax-input').value)||0;
+  document.getElementById('tax-label').textContent=v.toFixed(1)+'%';
 }
 
-function resetForm() {
-  document.getElementById('total').value = '';
-  document.getElementById('price').value = '';
-  document.getElementById('name').value = '';
-  document.getElementById('result').innerText = '';
+function setSplit(btn,mode){
+  splitMode=mode;
+  document.getElementById('split-toggle').querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('split-hint').textContent=mode==='rata'
+    ?'Semua orang bayar sama rata, fair and square!'
+    :'Yang makannya mahal, ya bayar lebih — no debat!';
+}
+
+function updateNums(){
+  document.querySelectorAll('.person-entry').forEach((r,i)=>{
+    const n=r.querySelector('.p-num');if(n)n.textContent=i+1;
+  });
+}
+
+function addRow(){
+  const list=document.getElementById('person-list');
+  const idx=list.querySelectorAll('.person-entry').length+1;
+  const div=document.createElement('div');div.className='person-entry';
+  div.innerHTML=`<div class="p-num">${idx}</div><input class="p-name" type="text" placeholder="Nama temen" autocomplete="off"/><input class="p-price" type="number" placeholder="Harga" min="0"/><button class="del-btn" onclick="removeRow(this)">×</button>`;
+  list.appendChild(div);
+}
+
+function removeRow(btn){
+  if(document.querySelectorAll('.person-entry').length<=1)return;
+  btn.closest('.person-entry').remove();updateNums();
+}
+
+function addExtra(){
+  const div=document.createElement('div');div.className='extra-row';
+  div.innerHTML=`<div class="extra-icon">+</div><input class="e-name" type="text" placeholder="Nama biaya (parkir, dll)" autocomplete="off"/><input class="e-price" type="number" placeholder="Rp" min="0"/><button class="del-btn" onclick="this.closest('.extra-row').remove()">×</button>`;
+  document.getElementById('extra-list').appendChild(div);
+}
+
+function fmt(n){return'Rp '+Math.round(n).toLocaleString('id-ID');}
+function getInitials(name){return name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+
+function resetAll(){
+  document.getElementById('bill-total').value='';
+  document.getElementById('person-list').innerHTML=`<div class="person-entry"><div class="p-num">1</div><input class="p-name" type="text" placeholder="Nama temen" autocomplete="off"/><input class="p-price" type="number" placeholder="Harga" min="0"/><button class="del-btn" onclick="removeRow(this)">×</button></div>`;
+  document.getElementById('extra-list').innerHTML='';
+  document.getElementById('tax-input').value=11;
+  document.getElementById('tax-label').textContent='11%';
+  document.getElementById('entry-error').classList.add('hidden');
+  document.getElementById('result-section').classList.add('hidden');
+  splitMode='rata';
+  document.getElementById('split-toggle').querySelectorAll('button').forEach((b,i)=>i===0?b.classList.add('on'):b.classList.remove('on'));
+  document.getElementById('split-hint').textContent='Semua orang bayar sama rata, fair and square!';
+  lastResult=null;
+}
+
+function calculate(){
+  const errEl=document.getElementById('entry-error');errEl.classList.add('hidden');
+  const people=[];let hasErr=false;
+  document.querySelectorAll('.person-entry').forEach(row=>{
+    const name=row.querySelector('.p-name').value.trim();
+    const price=parseFloat(row.querySelector('.p-price').value);
+    if(!name||isNaN(price)||price<0){hasErr=true;return;}
+    people.push({name,price});
+  });
+  if(hasErr||people.length===0){
+    errEl.textContent='Eh, ada yang belum keisi — cek nama sama harganya ya!';
+    errEl.classList.remove('hidden');return;
+  }
+
+  const taxPct=parseFloat(document.getElementById('tax-input').value)||0;
+  const subtotal=people.reduce((s,p)=>s+p.price,0);
+  const taxTotal=subtotal*(taxPct/100);
+  const extras=[];let extraTotal=0;
+  document.querySelectorAll('.extra-row').forEach(row=>{
+    const label=row.querySelector('.e-name').value.trim()||'Biaya lain';
+    const amount=parseFloat(row.querySelector('.e-price').value)||0;
+    if(amount>0){extras.push({label,amount});extraTotal+=amount;}
+  });
+  const grandTotal=subtotal+taxTotal+extraTotal;
+  const kasir=parseFloat(document.getElementById('bill-total').value)||0;
+
+  document.getElementById('r-grand').textContent=fmt(grandTotal);
+  document.getElementById('r-subtotal').textContent=fmt(subtotal);
+  document.getElementById('r-tax').textContent=fmt(taxTotal);
+  document.getElementById('r-extra').textContent=fmt(extraTotal);
+
+  const banner=document.getElementById('match-banner');
+  if(kasir>0){
+    const diff=Math.abs(grandTotal-kasir);const pct=(diff/kasir)*100;
+    banner.classList.remove('hidden','ok','warn','err');
+    if(diff<500){banner.className='match-banner ok';banner.textContent='Cocok sama struk kasir! Aman, gak ada yang nyolong';}
+    else if(pct<5){banner.className='match-banner warn';banner.textContent=`Selisih ${fmt(diff)} dari struk — cek lagi ada yang kelewat gak?`;}
+    else{banner.className='match-banner err';banner.textContent=`Waduh, beda ${fmt(diff)} dari struk kasir! Ada yang salah input nih`;}
+  }else{banner.classList.add('hidden');}
+
+  const resultsEl=document.getElementById('person-results');resultsEl.innerHTML='';
+  const computed=people.map((p,i)=>{
+    const prop=subtotal>0?p.price/subtotal:1/people.length;
+    const myTax=taxTotal*prop;
+    let myExtra=0;
+    extras.forEach(e=>{myExtra+=splitMode==='rata'?e.amount/people.length:e.amount*prop;});
+    return{name:p.name,price:p.price,myTax,myExtra,myTotal:p.price+myTax+myExtra,i};
+  });
+  lastResult={computed,subtotal,taxTotal,extraTotal,grandTotal,taxPct,extras,kasir};
+
+  computed.forEach(c=>{
+    const av=AVATARS[c.i%AVATARS.length];
+    const breakdown=['Makan '+fmt(c.price)];
+    if(c.myTax>0)breakdown.push('Pajak '+fmt(c.myTax));
+    if(c.myExtra>0)breakdown.push('Lain-lain '+fmt(c.myExtra));
+    const div=document.createElement('div');div.className='p-result-row';
+    div.innerHTML=`<div class="p-result-left"><div class="p-avatar" style="background:${av.bg};color:${av.c}">${getInitials(c.name)}</div><div><div class="p-result-name">${c.name}</div><div class="p-result-sub">${breakdown.join(' · ')}</div></div></div><div class="p-result-total">${fmt(c.myTotal)}</div>`;
+    resultsEl.appendChild(div);
+  });
+
+  const modeText=splitMode==='rata'?'rata':'proporsional';
+  document.getElementById('result-note').textContent=`Pajak proporsional · biaya lain dibagi ${modeText} · gak ada yang bisa kabur!`;
+  document.getElementById('result-section').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('result-section').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function shareWA(){
+  if(!lastResult)return;
+  const{computed,subtotal,taxTotal,extraTotal,grandTotal,taxPct,kasir}=lastResult;
+  let msg='🍽️ *Split Bill — siapa bayar berapa nih!*\n─────────────────\n';
+  computed.forEach(c=>{
+    msg+=`\n👤 *${c.name}*\n   Makan: ${fmt(c.price)}\n`;
+    if(c.myTax>0)msg+=`   Pajak (${taxPct}%): ${fmt(c.myTax)}\n`;
+    if(c.myExtra>0)msg+=`   Lain-lain: ${fmt(c.myExtra)}\n`;
+    msg+=`   ➡️ *Wajib bayar: ${fmt(c.myTotal)}*\n`;
+  });
+  msg+=`\n─────────────────\nTotal makan: ${fmt(subtotal)}\n`;
+  if(taxTotal>0)msg+=`Pajak: ${fmt(taxTotal)}\n`;
+  if(extraTotal>0)msg+=`Lain-lain: ${fmt(extraTotal)}\n`;
+  msg+=`*GRAND TOTAL: ${fmt(grandTotal)}*\n`;
+  if(kasir>0){const diff=Math.abs(grandTotal-kasir);msg+=diff<500?'\nStruk kasir: cocok!\n':`\nStruk kasir: ${fmt(kasir)} (selisih ${fmt(diff)})\n`;}
+  msg+='\n_gak ada yang boleh kabur ya bestie!_';
+  openLink('https://wa.me/?text='+encodeURIComponent(msg));
 }
 </script>
-
-</body>
-</html>
