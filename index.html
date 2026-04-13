@@ -22,9 +22,9 @@ html,body{margin:0;padding:0;background:#fff}
   border-radius:0 0 28px 28px;
   color:#fff;
 }
-
 .hero h1{margin:0;font-family:'Syne';font-size:38px}
 .hero span{color:#FF3FA4}
+.hero p{font-size:13px;opacity:.8;margin-top:6px}
 
 .content{padding:16px}
 
@@ -62,9 +62,16 @@ input,select{
   margin-top:20px;
 }
 
+.badge{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  font-weight:600;
+}
+.ok{background:#E1F5EE;color:#085041}
+.warn{background:#FAEEDA;color:#633806}
+
 .person{
-  display:flex;
-  justify-content:space-between;
   padding:10px 0;
   border-bottom:1px solid rgba(0,0,0,0.05);
 }
@@ -92,36 +99,52 @@ input,select{
 
 <div class="hero">
   <h1>Split<span>Bill</span></h1>
-  <p>Gasss biar gak ada yang kabur 😎</p>
+  <p>Itung dulu ya, biar hati tenang gak ada utang</p>
 </div>
 
 <div class="content">
 
+<!-- TOTAL KASIR -->
+<div class="section">
+  <div class="label">Total dari kasir (opsional)</div>
+  <input id="kasir" type="number" placeholder="Rp">
+</div>
+
+<!-- INFO -->
+<div class="section">
+  <div class="label">Tanggal & Tempat</div>
+  <div class="row">
+    <input id="tanggal" type="date">
+    <input id="tempat" type="text" placeholder="Nama tempat">
+  </div>
+</div>
+
+<!-- TAX -->
 <div class="section">
   <div class="label">Pajak (%)</div>
   <input id="tax" type="number" value="11">
 </div>
 
+<!-- PEOPLE -->
 <div class="section">
-  <div class="label">Orang</div>
+  <div class="label">Siapa bayar berapa</div>
   <div id="people"></div>
   <div class="add" onclick="addPerson()">+ tambah orang</div>
 </div>
 
+<!-- EXTRA -->
 <div class="section">
   <div class="label">Biaya lain</div>
   <div id="extras"></div>
   <div class="add" onclick="addExtra()">+ tambah biaya</div>
-</div>
 
-<div class="section">
-  <div class="label">Mode</div>
-  <select id="mode">
+  <select id="mode" style="display:none">
     <option value="rata">Rata</option>
     <option value="prop">Proporsional</option>
   </select>
 </div>
 
+<!-- ACTION -->
 <div class="row">
   <button class="btn blue" onclick="hitung()">Hitung</button>
   <button class="btn pink" onclick="resetAll()">Reset</button>
@@ -140,47 +163,15 @@ input,select{
 let people=[{name:'',price:0}];
 let extras=[];
 
-// STORAGE
-function save(){
-  localStorage.setItem('sb',JSON.stringify({people,extras,tax:tax.value,mode:mode.value}));
-}
-function load(){
-  const d=JSON.parse(localStorage.getItem('sb'));
-  if(!d)return;
-  people=d.people||people;
-  extras=d.extras||extras;
-  tax.value=d.tax||11;
-  mode.value=d.mode||'rata';
-}
-
-// PEOPLE
-function addPerson(){
-  people.push({name:'',price:0});
-  render();
-}
-function removePerson(i){
-  if(people.length===1)return;
-  people.splice(i,1);render();
-}
-
-// EXTRA
-function addExtra(){
-  extras.push({label:'',amount:0});
-  render();
-}
-function removeExtra(i){
-  extras.splice(i,1);render();
-}
-
-// RENDER
+// ===== RENDER =====
 function render(){
   const pEl=document.getElementById('people');
   pEl.innerHTML='';
   people.forEach((p,i)=>{
     pEl.innerHTML+=`
     <div class="row">
-      <input value="${p.name}" placeholder="Nama" onchange="people[${i}].name=this.value;save()">
-      <input type="number" value="${p.price}" placeholder="Harga" onchange="people[${i}].price=parseFloat(this.value)||0;save()">
+      <input value="${p.name}" placeholder="Nama" onchange="people[${i}].name=this.value">
+      <input type="number" value="${p.price}" placeholder="Harga" onchange="people[${i}].price=parseFloat(this.value)||0">
       <button onclick="removePerson(${i})">x</button>
     </div>`;
   });
@@ -190,64 +181,87 @@ function render(){
   extras.forEach((e,i)=>{
     eEl.innerHTML+=`
     <div class="row">
-      <input value="${e.label}" placeholder="Biaya" onchange="extras[${i}].label=this.value;save()">
-      <input type="number" value="${e.amount}" placeholder="Rp" onchange="extras[${i}].amount=parseFloat(this.value)||0;save()">
+      <input value="${e.label}" placeholder="Keterangan">
+      <input type="number" value="${e.amount}" placeholder="Rp" onchange="extras[${i}].amount=parseFloat(this.value)||0">
       <button onclick="removeExtra(${i})">x</button>
     </div>`;
   });
+
+  document.getElementById('mode').style.display = extras.length ? 'block' : 'none';
 }
 
-// HITUNG
+function addPerson(){people.push({name:'',price:0});render();}
+function removePerson(i){if(people.length>1){people.splice(i,1);render();}}
+
+function addExtra(){extras.push({label:'',amount:0});render();}
+function removeExtra(i){extras.splice(i,1);render();}
+
+// ===== HITUNG =====
 function hitung(){
+  const kasir=parseFloat(document.getElementById('kasir').value)||0;
   const taxPct=parseFloat(tax.value)||0;
   const subtotal=people.reduce((s,p)=>s+p.price,0);
   const taxTotal=subtotal*(taxPct/100);
   const extraTotal=extras.reduce((s,e)=>s+e.amount,0);
   const grand=subtotal+taxTotal+extraTotal;
 
-  let msg=`🍽️ Split Bill\nTotal: Rp ${Math.round(grand).toLocaleString('id-ID')}\n\n`;
   let html=`<div class="result">Total: Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
 
-  people.forEach(p=>{
-    let share=0;
-    if(mode.value==='rata'){
-      share=grand/people.length;
-    }else{
-      const prop=p.price/subtotal;
-      share=p.price + taxTotal*prop + extraTotal*prop;
-    }
+  // VALIDASI
+  if(kasir){
+    const diff=Math.abs(grand-kasir);
+    html+=diff<500
+      ? `<div class="badge ok">✅ Bayaran akur</div>`
+      : `<div class="badge warn">⚠️ Selisih Rp ${diff.toLocaleString('id-ID')}</div>`;
+  }
 
-    msg+=`${p.name||'-'}: Rp ${Math.round(share).toLocaleString('id-ID')}\n`;
-    html+=`<div class="person"><span>${p.name||'-'}</span><b>Rp ${Math.round(share).toLocaleString('id-ID')}</b></div>`;
+  let msg=`🍽️ Split Bill\n`;
+  msg+=`${tempat.value||'-'}\n${tanggal.value||'-'}\n\n`;
+
+  people.forEach(p=>{
+    const prop=p.price/subtotal;
+    const myTax=taxTotal*prop;
+    const myExtra=extras.reduce((s,e)=>{
+      return s + (mode.value==='rata'? e.amount/people.length : e.amount*prop);
+    },0);
+
+    const total=p.price+myTax+myExtra;
+
+    html+=`
+    <div class="person">
+      <b>${p.name||'-'}</b><br>
+      Makan: Rp ${p.price.toLocaleString('id-ID')}<br>
+      Pajak: Rp ${Math.round(myTax).toLocaleString('id-ID')}<br>
+      Lain: Rp ${Math.round(myExtra).toLocaleString('id-ID')}<br>
+      <b>Total: Rp ${Math.round(total).toLocaleString('id-ID')}</b>
+    </div>`;
+
+    msg+=`${p.name||'-'}\n`;
+    msg+=`Total: Rp ${Math.round(total).toLocaleString('id-ID')}\n\n`;
   });
+
+  msg+=`TOTAL: Rp ${Math.round(grand).toLocaleString('id-ID')}\n`;
+  msg+=`\nCuss langsung transfer ke yang tadi nalangin dulu ya gaesss!`;
 
   document.getElementById('result').innerHTML=html;
   document.getElementById('shareBtn').style.display='block';
 
   window.msg=msg;
-  save();
 }
 
-// SHARE
+// ===== SHARE =====
 function shareWA(){
-  window.open('https://wa.me/?text='+encodeURIComponent(window.msg),'_blank');
+  window.open('https://wa.me/?text='+encodeURIComponent(window.msg));
 }
 
-// RESET
+// ===== RESET =====
 function resetAll(){
-  localStorage.clear();
-  people=[{name:'',price:0}];
-  extras=[];
-  render();
-  result.innerHTML='';
-  shareBtn.style.display='none';
+  location.reload();
 }
 
-// INIT
-load();
 render();
 
-// SW
+// ===== SW =====
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js');
 }
