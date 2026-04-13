@@ -8,13 +8,13 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1B4FFF">
 
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-html,body{margin:0;padding:0;width:100%;background:#fff}
+html,body{margin:0;padding:0;background:#fff}
 *{box-sizing:border-box}
 
-.app{width:100%;min-height:100vh;font-family:'DM Sans',sans-serif}
+.app{width:100%;min-height:100vh;font-family:'DM Sans'}
 
 .hero{
   background:#1B4FFF;
@@ -23,7 +23,7 @@ html,body{margin:0;padding:0;width:100%;background:#fff}
   color:#fff;
 }
 
-.hero h1{font-family:'Syne';font-size:38px;margin:0}
+.hero h1{margin:0;font-family:'Syne';font-size:38px}
 .hero span{color:#FF3FA4}
 
 .content{padding:16px}
@@ -39,7 +39,7 @@ input,select{
   margin-bottom:8px;
 }
 
-.row{display:flex;gap:8px}
+.row{display:flex;gap:8px;margin-bottom:8px}
 
 .btn{
   flex:1;
@@ -52,6 +52,8 @@ input,select{
 .blue{background:#1B4FFF;color:#fff}
 .pink{background:#FF3FA4;color:#fff}
 
+.add{font-size:13px;color:#1B4FFF;cursor:pointer}
+
 .result{
   background:#1B4FFF;
   color:#fff;
@@ -60,9 +62,12 @@ input,select{
   margin-top:20px;
 }
 
-.person{display:flex;justify-content:space-between;padding:10px 0}
-
-.add{color:#1B4FFF;font-size:13px;cursor:pointer}
+.person{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid rgba(0,0,0,0.05);
+}
 
 .share{
   margin-top:10px;
@@ -87,7 +92,7 @@ input,select{
 
 <div class="hero">
   <h1>Split<span>Bill</span></h1>
-  <p>Hitung bareng, biar gak ribet 😎</p>
+  <p>Gasss biar gak ada yang kabur 😎</p>
 </div>
 
 <div class="content">
@@ -105,7 +110,8 @@ input,select{
 
 <div class="section">
   <div class="label">Biaya lain</div>
-  <input id="extra" type="number">
+  <div id="extras"></div>
+  <div class="add" onclick="addExtra()">+ tambah biaya</div>
 </div>
 
 <div class="section">
@@ -131,99 +137,117 @@ input,select{
 
 <script>
 
-// ===== STORAGE =====
-function save(){
-  localStorage.setItem('splitbill',JSON.stringify({people,tax:taxInput.value,extra:extraInput.value,mode:modeSelect.value}))
-}
-
-function load(){
-  const data=JSON.parse(localStorage.getItem('splitbill'));
-  if(!data)return;
-  people=data.people||[];
-  taxInput.value=data.tax||11;
-  extraInput.value=data.extra||0;
-  modeSelect.value=data.mode||'rata';
-}
-
-// ===== PEOPLE =====
 let people=[{name:'',price:0}];
+let extras=[];
 
+// STORAGE
+function save(){
+  localStorage.setItem('sb',JSON.stringify({people,extras,tax:tax.value,mode:mode.value}));
+}
+function load(){
+  const d=JSON.parse(localStorage.getItem('sb'));
+  if(!d)return;
+  people=d.people||people;
+  extras=d.extras||extras;
+  tax.value=d.tax||11;
+  mode.value=d.mode||'rata';
+}
+
+// PEOPLE
 function addPerson(){
   people.push({name:'',price:0});
   render();
 }
+function removePerson(i){
+  if(people.length===1)return;
+  people.splice(i,1);render();
+}
 
+// EXTRA
+function addExtra(){
+  extras.push({label:'',amount:0});
+  render();
+}
+function removeExtra(i){
+  extras.splice(i,1);render();
+}
+
+// RENDER
 function render(){
-  const el=document.getElementById('people');
-  el.innerHTML='';
+  const pEl=document.getElementById('people');
+  pEl.innerHTML='';
   people.forEach((p,i)=>{
-    el.innerHTML+=`
+    pEl.innerHTML+=`
     <div class="row">
       <input value="${p.name}" placeholder="Nama" onchange="people[${i}].name=this.value;save()">
       <input type="number" value="${p.price}" placeholder="Harga" onchange="people[${i}].price=parseFloat(this.value)||0;save()">
+      <button onclick="removePerson(${i})">x</button>
+    </div>`;
+  });
+
+  const eEl=document.getElementById('extras');
+  eEl.innerHTML='';
+  extras.forEach((e,i)=>{
+    eEl.innerHTML+=`
+    <div class="row">
+      <input value="${e.label}" placeholder="Biaya" onchange="extras[${i}].label=this.value;save()">
+      <input type="number" value="${e.amount}" placeholder="Rp" onchange="extras[${i}].amount=parseFloat(this.value)||0;save()">
+      <button onclick="removeExtra(${i})">x</button>
     </div>`;
   });
 }
 
-// ===== HITUNG =====
+// HITUNG
 function hitung(){
-  const tax=parseFloat(taxInput.value)||0;
-  const extra=parseFloat(extraInput.value)||0;
-  const mode=modeSelect.value;
-
-  const subtotal=people.reduce((a,b)=>a+b.price,0);
-  const taxTotal=subtotal*(tax/100);
-  const grand=subtotal+taxTotal+extra;
+  const taxPct=parseFloat(tax.value)||0;
+  const subtotal=people.reduce((s,p)=>s+p.price,0);
+  const taxTotal=subtotal*(taxPct/100);
+  const extraTotal=extras.reduce((s,e)=>s+e.amount,0);
+  const grand=subtotal+taxTotal+extraTotal;
 
   let msg=`🍽️ Split Bill\nTotal: Rp ${Math.round(grand).toLocaleString('id-ID')}\n\n`;
-
   let html=`<div class="result">Total: Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
 
   people.forEach(p=>{
     let share=0;
-    if(mode==='rata'){
+    if(mode.value==='rata'){
       share=grand/people.length;
     }else{
       const prop=p.price/subtotal;
-      share=p.price + taxTotal*prop + extra*prop;
+      share=p.price + taxTotal*prop + extraTotal*prop;
     }
 
     msg+=`${p.name||'-'}: Rp ${Math.round(share).toLocaleString('id-ID')}\n`;
-
     html+=`<div class="person"><span>${p.name||'-'}</span><b>Rp ${Math.round(share).toLocaleString('id-ID')}</b></div>`;
   });
 
   document.getElementById('result').innerHTML=html;
   document.getElementById('shareBtn').style.display='block';
 
-  window.lastMsg=msg;
+  window.msg=msg;
   save();
 }
 
-// ===== SHARE WA =====
+// SHARE
 function shareWA(){
-  const url='https://wa.me/?text='+encodeURIComponent(window.lastMsg);
-  window.open(url,'_blank');
+  window.open('https://wa.me/?text='+encodeURIComponent(window.msg),'_blank');
 }
 
-// ===== RESET =====
+// RESET
 function resetAll(){
   localStorage.clear();
   people=[{name:'',price:0}];
+  extras=[];
   render();
-  document.getElementById('result').innerHTML='';
-  document.getElementById('shareBtn').style.display='none';
+  result.innerHTML='';
+  shareBtn.style.display='none';
 }
 
-// init
-const taxInput=document.getElementById('tax');
-const extraInput=document.getElementById('extra');
-const modeSelect=document.getElementById('mode');
-
+// INIT
 load();
 render();
 
-// ===== SERVICE WORKER =====
+// SW
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js');
 }
