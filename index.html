@@ -14,14 +14,37 @@ html,body{
   padding:0;
   background:#f6f7fb;
   font-family:'DM Sans';
-  scroll-behavior:auto;
 }
 *{box-sizing:border-box}
 
-.screen{display:none}
-.active{display:block}
+/* 🔥 SCREEN SYSTEM (NATIVE FEEL) */
+.screen{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  overflow:auto;
+  background:#f6f7fb;
 
-.container{max-width:420px;margin:auto;min-height:100vh;background:#fff}
+  transform:translateX(100%);
+  opacity:0;
+  transition:all .35s cubic-bezier(.22,.61,.36,1);
+  will-change:transform;
+}
+
+.screen.active{
+  transform:translateX(0);
+  opacity:1;
+  z-index:2;
+}
+
+.screen.exit-left{
+  transform:translateX(-100%);
+  opacity:0;
+  z-index:1;
+}
+
+.container{max-width:420px;margin:auto;background:#fff;min-height:100%}
 
 .hero{
   background:#1B4FFF;
@@ -30,11 +53,11 @@ html,body{
   border-radius:0 0 28px 28px;
 }
 
-.hero h1{margin:0;font-family:'Syne';font-size:38px}
+.hero h1{margin:0;font-family:'Syne';font-size:36px}
 .hero span{color:#FF3FA4}
 
 .center{
-  height:100vh;
+  height:100%;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -227,18 +250,21 @@ function tap(el){
 function openMode(m){
   mode = m;
 
-  landing.classList.remove('active');
-  app.classList.add('active');
+  const landingEl = document.getElementById('landing');
+  const appEl = document.getElementById('app');
 
-  makanUI.style.display = m==='makan'?'block':'none';
-  patunganUI.style.display = m==='patungan'?'block':'none';
+  document.getElementById('makanUI').style.display = m==='makan'?'block':'none';
+  document.getElementById('patunganUI').style.display = m==='patungan'?'block':'none';
 
-  // 💥 FORCE SCROLL FIX
-  window.scrollTo(0,0);
-  document.documentElement.scrollTop = 0;
-  document.body.scrollTop = 0;
+  appEl.scrollTop = 0;
 
-  setTimeout(()=>window.scrollTo(0,0),50);
+  // 🔥 SLIDE ANIMATION
+  landingEl.classList.add('exit-left');
+  appEl.classList.add('active');
+
+  setTimeout(()=>{
+    landingEl.classList.remove('active','exit-left');
+  },350);
 }
 
 function toggleTax(){
@@ -249,10 +275,7 @@ function toggleTax(){
 
 function getNum(v){return parseFloat((v||'').replace(/\./g,''))||0;}
 
-function addPerson(){
-  people.push({name:'',price:''});
-  render();
-}
+function addPerson(){people.push({name:'',price:''});render();}
 
 function render(){
   peopleEl.innerHTML='';
@@ -266,10 +289,7 @@ function render(){
   });
 }
 
-function addExtra(){
-  extras.push({amount:''});
-  renderExtras();
-}
+function addExtra(){extras.push({amount:''});renderExtras();}
 
 function renderExtras(){
   extrasEl.innerHTML='';
@@ -280,10 +300,7 @@ function renderExtras(){
   });
 }
 
-function addExtra2(){
-  extras2.push({amount:''});
-  extras2El.innerHTML+=`<input placeholder="Biaya">`;
-}
+function addExtra2(){extras2.push({amount:''});extras2El.innerHTML+=`<input placeholder="Biaya">`;}
 
 function hitung(){
 
@@ -341,7 +358,7 @@ if(kasirVal){
     if(est>0)d+=`<div class="badge warn">Estimasi pajak ${est.toFixed(1)}%</div>`;
   }
 
-  if(diff<500)d+=`<div class="badge ok">Cocok</div>`;
+  if(diff<500)d+=`<div class="badge ok">Bayaran akur</div>`;
   else if(diff<5000)d+=`<div class="badge warn">Selisih Rp ${diff.toLocaleString('id-ID')}</div>`;
   else d+=`<div class="badge err">Selisih besar Rp ${diff.toLocaleString('id-ID')}</div>`;
 }
