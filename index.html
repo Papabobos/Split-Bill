@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
 <meta charset="UTF-8">
@@ -11,69 +12,47 @@
 html,body{margin:0;padding:0;background:#f6f7fb;font-family:'DM Sans'}
 *{box-sizing:border-box}
 
-.screen{display:none}
+.screen{display:none;transition:all .3s ease}
 .active{display:block}
 
 .container{max-width:420px;margin:auto;min-height:100vh;background:#fff}
 
-.hero{
-  background:#1B4FFF;
-  color:#fff;
-  padding:24px;
-  border-radius:0 0 28px 28px;
-}
+.hero{background:#1B4FFF;color:#fff;padding:24px;border-radius:0 0 28px 28px}
 .hero h1{margin:0;font-family:'Syne';font-size:38px}
 .hero span{color:#FF3FA4}
 .hero p{font-size:13px;opacity:.85}
 
-.center{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:20px;
-}
+.center{height:100vh;display:flex;flex-direction:column;justify-content:center;padding:20px}
 
-.btn{
-  width:100%;
-  padding:16px;
-  border:none;
-  border-radius:16px;
-  font-weight:700;
-  margin-top:10px;
-}
-
+.btn{width:100%;padding:16px;border:none;border-radius:16px;font-weight:700;margin-top:10px;position:relative;overflow:hidden}
 .blue{background:#1B4FFF;color:#fff}
 .pink{background:#FF3FA4;color:#fff}
+
+.btn:active{transform:scale(.96)}
+
+.btn::after{
+content:"";
+position:absolute;
+width:100px;height:100px;
+background:rgba(255,255,255,.3);
+border-radius:50%;
+transform:scale(0);opacity:0;
+}
+.btn.ripple::after{animation:ripple .5s}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
 
 .content{padding:16px 16px 100px}
 
 .label{font-size:11px;font-weight:700;margin:10px 0 6px}
-input{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ddd;
-  margin-bottom:8px;
-}
+input{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-bottom:8px}
 
 .row{display:flex;gap:8px}
 
-.card{
-  background:#fff;
-  border:1px solid #eee;
-  border-radius:14px;
-  padding:12px;
-  margin-bottom:10px;
-}
+.card{background:#fff;border:1px solid #eee;border-radius:14px;padding:12px;margin-bottom:10px}
 
-.result{
-  background:#1B4FFF;
-  color:#fff;
-  padding:18px;
-  border-radius:18px;
-  margin-top:20px;
-}
+.result{background:#1B4FFF;color:#fff;padding:18px;border-radius:18px;margin-top:20px}
+.fade-in{animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 .badge{padding:10px;border-radius:10px;margin-top:10px;font-size:13px}
 .ok{background:#E1F5EE;color:#085041}
@@ -82,60 +61,48 @@ input{
 
 .person{border-bottom:1px solid #eee;padding:10px 0}
 
-.share{
-  margin-top:10px;
-  background:#25D366;
-  color:#fff;
-  padding:14px;
-  border-radius:14px;
-  text-align:center;
-  font-weight:700;
-}
+.share{margin-top:10px;background:#25D366;color:#fff;padding:14px;border-radius:14px;text-align:center;font-weight:700}
 
 .sticky{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  max-width:420px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#fff;
-  padding:12px;
-  display:flex;
-  gap:10px;
-  box-shadow:0 -6px 16px rgba(0,0,0,0.08);
+position:fixed;bottom:0;width:100%;max-width:420px;
+left:50%;transform:translateX(-50%);
+background:#fff;padding:12px;display:flex;gap:10px;
+box-shadow:0 -6px 16px rgba(0,0,0,.08)
 }
 </style>
+
 </head>
 
 <body>
 
 <!-- LANDING -->
+
 <div id="landing" class="screen active center">
-  <h1>Split<span>Bill</span></h1>
-  <p>Itung dulu ya, biar hati tenang gak ada utang</p>
-  <button class="btn blue" onclick="openMode('makan')">🍽️ Makan Bareng</button>
-  <button class="btn pink" onclick="openMode('patungan')">🛒 Patungan Barang</button>
+<h1>Split<span>Bill</span></h1>
+<p>Itung dulu ya, biar hati tenang gak ada utang</p>
+
+<button class="btn blue" onclick="tap(this);openMode('makan')">🍽️ Makan Bareng</button> <button class="btn pink" onclick="tap(this);openMode('patungan')">🛒 Patungan Barang</button>
+
 </div>
 
 <!-- APP -->
+
 <div id="app" class="screen">
 <div class="container">
 
 <div class="hero">
-  <h1>Split<span>Bill</span></h1>
+<h1>Split<span>Bill</span></h1>
 </div>
 
 <div class="content">
 
-<!-- COMMON -->
 <div class="label">Total kasir (opsional)</div>
-<input id="kasir" inputmode="numeric">
+<input id="kasir" inputmode="numeric" placeholder="">
 
 <div class="label">Tanggal & Tempat Pembelian</div>
 <div class="row">
-  <input id="tanggal" type="date">
-  <input id="tempat" placeholder="Nama tempat">
+<input id="tanggal" type="date">
+<input id="tempat" placeholder="Nama tempat">
 </div>
 
 <div class="label">Pajak</div>
@@ -143,21 +110,20 @@ input{
 <input id="tax" value="11" inputmode="numeric">
 
 <!-- MAKAN -->
-<div id="makanUI">
 
+<div id="makanUI">
 <div class="label">Siapa bayar berapa</div>
 <div id="people"></div>
-<button onclick="addPerson()">+ tambah orang</button>
+<button onclick="tap(this);addPerson()">+ tambah orang</button>
 
 <div class="label">Biaya lain</div>
 <div id="extras"></div>
-<button onclick="addExtra()">+ tambah biaya</button>
-
+<button onclick="tap(this);addExtra()">+ tambah biaya</button>
 </div>
 
 <!-- PATUNGAN -->
-<div id="patunganUI" style="display:none">
 
+<div id="patunganUI" style="display:none">
 <div class="label">Jumlah orang</div>
 <input id="jumlah">
 
@@ -166,12 +132,11 @@ input{
 
 <div class="label">Biaya lain</div>
 <div id="extras2"></div>
-<button onclick="addExtra2()">+ biaya</button>
+<button onclick="tap(this);addExtra2()">+ biaya</button>
 
 <div class="label">Transfer ke</div>
 <input id="rek_nama" placeholder="Nama">
 <input id="rek_bank" placeholder="Bank + No Rek">
-
 </div>
 
 <div id="result"></div>
@@ -183,8 +148,8 @@ input{
 </div>
 
 <div class="sticky">
-  <button class="btn blue" onclick="hitung()">Hitung</button>
-  <button class="btn pink" onclick="resetAll()">Reset</button>
+<button class="btn blue" onclick="tap(this);hitung()">Hitung</button>
+<button class="btn pink" onclick="tap(this);resetAll()">Reset</button>
 </div>
 
 <script>
@@ -194,139 +159,139 @@ let people=[{name:'',price:''}];
 let extras=[];
 let extras2=[];
 
-function openMode(m){
-  mode=m;
-  document.getElementById('landing').classList.remove('active');
-  document.getElementById('app').classList.add('active');
+function tap(el){
+el.classList.remove('ripple');void el.offsetWidth;
+el.classList.add('ripple');
+if(navigator.vibrate) navigator.vibrate(10);
+}
 
-  document.getElementById('makanUI').style.display = m==='makan'?'block':'none';
-  document.getElementById('patunganUI').style.display = m==='patungan'?'block':'none';
+function openMode(m){
+mode=m;
+landing.classList.remove('active');
+app.classList.add('active');
+
+makanUI.style.display = m==='makan'?'block':'none';
+patunganUI.style.display = m==='patungan'?'block':'none';
+
+setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),50);
 }
 
 function toggleTax(){
-  let t=tax_toggle.checked;
-  tax.disabled=!t;
-  if(!t) tax.value='';
-  else if(!tax.value) tax.value='11';
+tax.disabled=!tax_toggle.checked;
+if(!tax_toggle.checked) tax.value='';
+else if(!tax.value) tax.value='11';
 }
 
 function getNum(v){return parseFloat((v||'').replace(/\./g,''))||0;}
 
 function addPerson(){
-  people.push({name:'',price:''});
-  render();
+people.push({name:'',price:''});
+render();
 }
 
 function render(){
-  let el=document.getElementById('people');el.innerHTML='';
-  people.forEach((p,i)=>{
-    el.innerHTML+=`
-    <div class="row">
-      <input placeholder="Nama" onchange="people[${i}].name=this.value">
-      <input placeholder="Harga" inputmode="numeric"
-      oninput="this.value=this.value.replace(/\\D/g,'').replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');people[${i}].price=this.value">
-    </div>`;
-  });
+peopleEl.innerHTML='';
+people.forEach((p,i)=>{
+peopleEl.innerHTML+=`
+<div class="row">
+<input placeholder="Nama" onchange="people[${i}].name=this.value">
+<input placeholder="Harga" inputmode="numeric"
+oninput="this.value=this.value.replace(/\\D/g,'').replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');people[${i}].price=this.value">
+</div>`;
+});
 }
 
 function addExtra(){
-  extras.push({amount:''});
-  renderExtras();
+extras.push({amount:''});
+renderExtras();
 }
+
 function renderExtras(){
-  let el=document.getElementById('extras');el.innerHTML='';
-  extras.forEach((e,i)=>{
-    el.innerHTML+=`<input placeholder="Biaya"
-    oninput="this.value=this.value.replace(/\\D/g,'').replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');extras[${i}].amount=this.value">`;
-  });
+extrasEl.innerHTML='';
+extras.forEach((e,i)=>{
+extrasEl.innerHTML+=`
+<input placeholder="Biaya"
+oninput="this.value=this.value.replace(/\\D/g,'').replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');extras[${i}].amount=this.value">`;
+});
 }
 
 function addExtra2(){
-  extras2.push({amount:''});
-  let el=document.getElementById('extras2');
-  el.innerHTML+=`<input placeholder="Biaya">`;
+extras2.push({amount:''});
+extras2El.innerHTML+=`<input placeholder="Biaya">`;
 }
 
 function hitung(){
 
-let subtotal=0, extraTotal=0, taxTotal=0, grand=0, kasirVal=getNum(kasir.value);
+let subtotal=0,extraTotal=0,taxTotal=0,grand=0,kasirVal=getNum(kasir.value);
 
 if(mode==='makan'){
-  subtotal=people.reduce((s,p)=>s+getNum(p.price),0);
-  extraTotal=extras.reduce((s,e)=>s+getNum(e.amount),0);
-  taxTotal= tax_toggle.checked ? subtotal*(getNum(tax.value)/100) : 0;
-  grand=subtotal+taxTotal+extraTotal;
+subtotal=people.reduce((s,p)=>s+getNum(p.price),0);
+extraTotal=extras.reduce((s,e)=>s+getNum(e.amount),0);
+taxTotal=tax_toggle.checked?subtotal*(getNum(tax.value)/100):0;
+grand=subtotal+taxTotal+extraTotal;
 
-  let html=`<div id="hasil" class="result">Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
+let html=`<div id="hasil" class="result">Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
 
-  people.forEach(p=>{
-    let prop=subtotal?getNum(p.price)/subtotal:0;
-    let myTax=taxTotal*prop;
-    let myExtra=extraTotal/people.length;
-    let total=getNum(p.price)+myTax+myExtra;
+people.forEach(p=>{
+let prop=subtotal?getNum(p.price)/subtotal:0;
+let myTax=taxTotal*prop;
+let myExtra=extraTotal/people.length;
+let total=getNum(p.price)+myTax+myExtra;
 
-    html+=`<div class="person"><b>${p.name||'-'}</b><br>
-    Bayar: Rp ${getNum(p.price).toLocaleString('id-ID')}<br>
-    Pajak: Rp ${Math.round(myTax).toLocaleString('id-ID')}<br>
-    Lain: Rp ${Math.round(myExtra).toLocaleString('id-ID')}<br>
-    <b>Total: Rp ${Math.round(total).toLocaleString('id-ID')}</b></div>`;
-  });
+html+=`<div class="person"><b>${p.name||'-'}</b><br>
+Bayar: Rp ${getNum(p.price).toLocaleString('id-ID')}<br>
+Pajak: Rp ${Math.round(myTax).toLocaleString('id-ID')}<br>
+Lain: Rp ${Math.round(myExtra).toLocaleString('id-ID')}<br>
+<b>Total: Rp ${Math.round(total).toLocaleString('id-ID')}</b></div>`;
+});
 
-  result.innerHTML=html;
+result.innerHTML=`<div class="fade-in">${html}</div>`;
 }
 
 if(mode==='patungan'){
-  let total=getNum(kasir.value);
-  taxTotal= tax_toggle.checked ? total*(getNum(tax.value)/100) : 0;
-  grand=total+taxTotal;
-  let count=getNum(jumlah.value)||1;
+let total=getNum(kasir.value);
+taxTotal=tax_toggle.checked?total*(getNum(tax.value)/100):0;
+grand=total+taxTotal;
+let count=getNum(jumlah.value)||1;
+let per=grand/count;
 
-  let per=grand/count;
-  let arr=names.value.split(',');
+let html=`<div id="hasil" class="result">Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
 
-  let html=`<div id="hasil" class="result">Rp ${Math.round(grand).toLocaleString('id-ID')}</div>`;
+names.value.split(',').forEach(n=>{
+html+=`<div class="person">${n}: Rp ${Math.round(per).toLocaleString('id-ID')}</div>`;
+});
 
-  arr.forEach(n=>{
-    html+=`<div class="person">${n}: Rp ${Math.round(per).toLocaleString('id-ID')}</div>`;
-  });
+html+=`<div class="person"><b>Transfer ke:</b><br>${rek_nama.value}<br>${rek_bank.value}</div>`;
 
-  html+=`<div class="person"><b>Transfer ke:</b><br>${rek_nama.value}<br>${rek_bank.value}</div>`;
-
-  result.innerHTML=html;
+result.innerHTML=`<div class="fade-in">${html}</div>`;
 }
 
-// ===== DETECT =====
-let detectHTML='';
+// detect
+let d='';
 if(kasirVal){
-  let diff=Math.abs(grand-kasirVal);
-
-  if(mode==='makan'){
-    let est=(kasirVal-subtotal-extraTotal)/subtotal*100;
-    if(est>0) detectHTML+=`<div class="badge warn">🔍 Estimasi pajak ${est.toFixed(1)}%</div>`;
-  }
-
-  if(diff<500) detectHTML+=`<div class="badge ok">✅ Cocok</div>`;
-  else if(diff<5000) detectHTML+=`<div class="badge warn">⚠️ Selisih Rp ${diff.toLocaleString('id-ID')}</div>`;
-  else detectHTML+=`<div class="badge err">❌ Selisih besar Rp ${diff.toLocaleString('id-ID')}</div>`;
+let diff=Math.abs(grand-kasirVal);
+if(mode==='makan'){
+let est=(kasirVal-subtotal-extraTotal)/subtotal*100;
+if(est>0)d+=`<div class="badge warn">Estimasi pajak ${est.toFixed(1)}%</div>`;
+}
+if(diff<500)d+=`<div class="badge ok">Cocok</div>`;
+else if(diff<5000)d+=`<div class="badge warn">Selisih Rp ${diff.toLocaleString('id-ID')}</div>`;
+else d+=`<div class="badge err">Selisih besar Rp ${diff.toLocaleString('id-ID')}</div>`;
 }
 
-detect.innerHTML=detectHTML;
+detect.innerHTML=d;
 share.style.display='block';
 
 setTimeout(()=>document.getElementById('hasil').scrollIntoView({behavior:'smooth'}),100);
-
 }
 
-// SHARE
 function shareWA(){
-  let text=document.getElementById('result').innerText;
-  window.open('https://wa.me/?text='+encodeURIComponent(text));
+let text=result.innerText+"\n\nCuss langsung transfer ke yang tadi nalangin dulu ya gaesss!";
+window.open('https://wa.me/?text='+encodeURIComponent(text));
 }
 
-// RESET
 function resetAll(){location.reload();}
 
-// INIT
 render();
 
 </script>
