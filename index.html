@@ -3,7 +3,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SplitBill</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -12,12 +12,11 @@
 html,body{
   margin:0;
   padding:0;
-  background:#f6f7fb;
   font-family:'DM Sans';
-  overflow:hidden;
+  background:#f6f7fb;
 }
 
-/* 🔥 SCREEN SYSTEM */
+/* SCREEN SYSTEM */
 .screen{
   position:fixed;
   inset:0;
@@ -25,11 +24,9 @@ html,body{
   height:100%;
   overflow:auto;
   background:#f6f7fb;
-
   transform:translateX(100%);
   opacity:0;
-  transition:all .35s cubic-bezier(.22,.61,.36,1);
-  will-change:transform;
+  transition:.35s cubic-bezier(.22,.61,.36,1);
 }
 
 .screen.active{
@@ -38,50 +35,39 @@ html,body{
   z-index:2;
 }
 
-.screen.exit-left{
+.screen.exit{
   transform:translateX(-100%);
   opacity:0;
 }
 
-.container{
-  max-width:420px;
-  margin:auto;
-  min-height:100%;
-  background:#fff;
-}
+/* UI */
+.container{max-width:420px;margin:auto;background:#fff;min-height:100%}
 
 .hero{
   background:#1B4FFF;
   color:#fff;
-  padding:18px 16px;
-  border-radius:0 0 24px 24px;
+  padding:16px;
   display:flex;
   align-items:center;
   gap:10px;
+  border-radius:0 0 20px 20px;
 }
 
-.hero h1{
-  margin:0;
-  font-family:'Syne';
-  font-size:30px;
-}
-
-.hero span{color:#FF3FA4}
-
-.back-btn{
-  background:rgba(255,255,255,0.2);
+.back{
+  background:rgba(255,255,255,.2);
   border:none;
   color:#fff;
   padding:6px 10px;
   border-radius:10px;
-  font-size:14px;
 }
 
+.hero h1{margin:0;font-family:'Syne'}
+
 .center{
-  height:100%;
   display:flex;
   flex-direction:column;
   justify-content:center;
+  height:100%;
   padding:20px;
 }
 
@@ -89,83 +75,60 @@ html,body{
   width:100%;
   padding:16px;
   border:none;
-  border-radius:16px;
+  border-radius:14px;
   font-weight:700;
   margin-top:10px;
-  cursor:pointer;
-  transition:.2s;
 }
-
-.btn:active{transform:scale(.97)}
 
 .blue{background:#1B4FFF;color:#fff}
 .pink{background:#FF3FA4;color:#fff}
 
 .content{padding:16px 16px 120px}
 
-.label{
-  font-size:11px;
-  font-weight:700;
-  margin:10px 0 6px;
-  color:#444;
-}
+label{font-size:12px;font-weight:700}
 
 input{
   width:100%;
   padding:10px;
   border-radius:10px;
   border:1px solid #ddd;
-  margin-bottom:8px;
+  margin:6px 0;
 }
 
 .row{display:flex;gap:8px}
 
+.person{padding:8px 0;border-bottom:1px solid #eee}
+
 .result{
   background:#1B4FFF;
   color:#fff;
-  padding:18px;
-  border-radius:18px;
-  margin-top:20px;
-}
-
-.person{
-  border-bottom:1px solid #eee;
-  padding:10px 0;
-}
-
-.badge{
-  padding:10px;
-  border-radius:10px;
+  padding:16px;
+  border-radius:14px;
   margin-top:10px;
-  font-size:13px;
 }
-
-.ok{background:#E1F5EE;color:#085041}
-.warn{background:#FAEEDA;color:#633806}
-.err{background:#FCEBEB;color:#791F1F}
 
 .share{
-  margin-top:10px;
   background:#25D366;
   color:#fff;
   padding:14px;
   border-radius:14px;
   text-align:center;
   font-weight:700;
+  margin-top:10px;
 }
 
 .sticky{
   position:fixed;
   bottom:0;
-  left:50%;
-  transform:translateX(-50%);
   width:100%;
   max-width:420px;
+  left:50%;
+  transform:translateX(-50%);
   display:flex;
   gap:10px;
+  padding:10px;
   background:#fff;
-  padding:12px;
-  box-shadow:0 -6px 16px rgba(0,0,0,.08);
+  box-shadow:0 -5px 15px rgba(0,0,0,.1);
 }
 </style>
 
@@ -176,8 +139,8 @@ input{
 <!-- LANDING -->
 
 <div id="landing" class="screen active center">
-  <h1>Split<span>Bill</span></h1>
-  <p>Itung dulu ya, biar hati tenang gak ada utang</p>
+<h1>SplitBill</h1>
+<p>Itung dulu ya, biar tenang</p>
 
 <button class="btn blue" onclick="openMode('makan')">🍽️ Makan Bareng</button> <button class="btn pink" onclick="openMode('patungan')">🛒 Patungan Barang</button>
 
@@ -190,53 +153,57 @@ input{
 <div class="container">
 
 <div class="hero">
-  <button class="back-btn" onclick="goBack()">←</button>
-  <h1>Split<span>Bill</span></h1>
+<button class="back" onclick="goBack()">←</button>
+<h1>SplitBill</h1>
 </div>
 
 <div class="content">
 
-<div class="label">Total kasir (opsional)</div>
-<input id="kasir" inputmode="numeric">
+<label>Total kasir</label> <input id="kasir">
 
-<div class="label">Tanggal & Tempat</div>
+<label>Tanggal & Tempat</label>
+
 <div class="row">
 <input id="tanggal" type="date">
-<input id="tempat" placeholder="Tempat">
+<input id="tempat">
 </div>
 
-<div class="label">Pajak (%)</div>
-<input id="tax" value="11" inputmode="numeric">
+<label>Pajak (%)</label> <input id="tax" value="11">
 
 <!-- MAKAN -->
 
 <div id="makanUI">
-<div class="label">Siapa bayar berapa</div>
+<label>Siapa bayar berapa</label>
 <div id="people"></div>
 <button onclick="addPerson()">+ tambah orang</button>
 
-<div class="label">Biaya lain</div>
+<label>Biaya lain</label>
+
 <div id="extras"></div>
-<button onclick="addExtra()">+ tambah biaya</button>
+<button onclick="addExtra()">+ biaya</button>
 </div>
 
 <!-- PATUNGAN -->
 
 <div id="patunganUI" style="display:none">
-<div class="label">Jumlah orang</div>
-<input id="jumlah">
 
-<div class="label">Nama (pisah koma)</div>
-<input id="names">
+<label>Jumlah orang</label> <input id="jumlah">
 
-<div class="label">Transfer ke</div>
-<input id="rek_nama">
-<input id="rek_bank">
+<label>Nama (pisah koma)</label> <input id="names">
+
+<label>Biaya lain</label>
+
+<div id="extras2"></div>
+<button onclick="addExtra2()">+ biaya</button>
+
 </div>
 
+<!-- 🔥 REKENING (WAJIB ADA DI 2 MODE) -->
+
+<label>Transfer ke</label> <input id="rek_nama" placeholder="Nama"> <input id="rek_bank" placeholder="Bank & No Rek">
+
 <div id="result"></div>
-<div id="detect"></div>
-<div id="share" class="share" style="display:none" onclick="shareWA()">Share WA 🚀</div>
+<div id="share" class="share" onclick="shareWA()">Share WhatsApp</div>
 
 </div>
 </div>
@@ -254,93 +221,107 @@ input{
 let mode='makan';
 let people=[{name:'',price:''}];
 let extras=[];
+let extras2=[];
 
+/* NAV */
 function openMode(m){
-  mode=m;
+mode=m;
 
-  const landing=document.getElementById('landing');
-  const app=document.getElementById('app');
+landing.classList.add('exit');
+app.classList.add('active');
 
-  document.getElementById('makanUI').style.display=m==='makan'?'block':'none';
-  document.getElementById('patunganUI').style.display=m==='patungan'?'block':'none';
+document.getElementById('makanUI').style.display=m==='makan'?'block':'none';
+document.getElementById('patunganUI').style.display=m==='patungan'?'block':'none';
 
-  landing.classList.add('exit-left');
-  app.classList.add('active');
-
-  setTimeout(()=>{
-    landing.classList.remove('active','exit-left');
-  },350);
+setTimeout(()=>{
+landing.classList.remove('active','exit');
+},300);
 }
 
 function goBack(){
-  const landing=document.getElementById('landing');
-  const app=document.getElementById('app');
-
-  landing.classList.add('active');
-  app.classList.add('exit-left');
-
-  setTimeout(()=>{
-    app.classList.remove('active','exit-left');
-  },300);
+landing.classList.add('active');
+app.classList.remove('active');
 }
 
+/* DATA */
 function addPerson(){
-  people.push({name:'',price:''});
-  render();
+people.push({name:'',price:''});
+render();
 }
 
 function render(){
-  peopleEl.innerHTML='';
-  people.forEach((p,i)=>{
-    peopleEl.innerHTML+=`
-    <div class="row">
-      <input placeholder="Nama" onchange="people[${i}].name=this.value">
-      <input placeholder="Harga" inputmode="numeric"
-      oninput="people[${i}].price=this.value">
-    </div>`;
-  });
+peopleEl.innerHTML='';
+people.forEach((p,i)=>{
+peopleEl.innerHTML+=`
+<div class="row">
+<input placeholder="Nama" onchange="people[${i}].name=this.value">
+<input placeholder="Harga" onchange="people[${i}].price=this.value">
+</div>`;
+});
 }
 
 function addExtra(){
-  extras.push({amount:''});
-  extrasEl.innerHTML='';
-  extras.forEach((e,i)=>{
-    extrasEl.innerHTML+=`
-    <input placeholder="Biaya" oninput="extras[${i}].amount=this.value">`;
-  });
+extras.push({amount:''});
+extrasEl.innerHTML='';
+extras.forEach((e,i)=>{
+extrasEl.innerHTML+=`<input placeholder="Biaya" onchange="extras[${i}].amount=this.value">`;
+});
 }
 
+function addExtra2(){
+extras2.push({amount:''});
+extras2El.innerHTML+=`<input placeholder="Biaya">`;
+}
+
+/* HITUNG */
 function hitung(){
 
-let subtotal=0,extraTotal=0,taxTotal=0;
+let subtotal=0,extra=0,tax=0;
 
 if(mode==='makan'){
-
 subtotal=people.reduce((s,p)=>s+(+p.price||0),0);
-extraTotal=extras.reduce((s,e)=>s+(+e.amount||0),0);
-taxTotal=subtotal*(+tax.value/100);
+extra=extras.reduce((s,e)=>s+(+e.amount||0),0);
+tax=subtotal*(+tax.value/100);
 
-let grand=subtotal+taxTotal+extraTotal;
+let grand=subtotal+extra+tax;
 
-let html=`<div class="result">Rp ${grand.toLocaleString('id-ID')}</div>`;
+let html=`<div class="result">Total: Rp ${grand.toLocaleString('id-ID')}</div>`;
 
 people.forEach(p=>{
-html+=`<div class="person">${p.name} - Rp ${(+p.price||0).toLocaleString('id-ID')}</div>`;
+html+=`<div class="person">${p.name} - Rp ${(p.price||0)}</div>`;
 });
 
 result.innerHTML=html;
 }
 
-detect.innerHTML='';
+if(mode==='patungan'){
+let total=+kasir.value||0;
+tax=total*(+tax.value/100);
+let grand=total+tax;
+
+let per=grand/(+jumlah.value||1);
+
+let html=`<div class="result">Total: Rp ${grand.toLocaleString('id-ID')}</div>`;
+
+names.value.split(',').forEach(n=>{
+html+=`<div class="person">${n} - Rp ${per.toFixed(0)}</div>`;
+});
+
+result.innerHTML=html;
+}
+
 share.style.display='block';
-
 }
 
+/* SHARE */
 function shareWA(){
-let text=result.innerText+"\n\nCuss bayar ya gaesss!";
-window.open('https://wa.me/?text='+encodeURIComponent(text));
+let text=result.innerText+
+"\n\nTransfer ke: "+rek_nama.value+" - "+rek_bank.value+
+"\n\nCuss bayar ya!";
+window.open("https://wa.me/?text="+encodeURIComponent(text));
 }
 
+/* INIT */
 render();
 
 </script>
