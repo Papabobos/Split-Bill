@@ -216,7 +216,7 @@
       <div class="home-tag">Split Bill</div>
       <div class="home-title">Itung<br>dulu<span>,</span></div>
       <div class="home-title2">bestie!</div>
-      <div class="home-tagline">Hati tenang, nggak ada utang yang menggantung</div>
+      <div class="home-tagline">Hati tenang, nggak ada utang</div>
     </div>
     <div>
       <div class="home-q">Mau split bill apa nih?</div>
@@ -283,7 +283,7 @@
     </div>
 
     <div class="section">
-      <div class="section-label">Pengaturan pajak</div>
+      <div class="section-label">Pajakin aja terus</div>
       <div class="card">
         <div class="setting-inner">
           <div class="setting-row">
@@ -304,12 +304,12 @@
           <div class="person-entry">
             <div class="p-num">1</div>
             <input class="p-name" type="text" placeholder="Nama temen" autocomplete="off" inputmode="text" />
-            <input class="p-price" type="number" placeholder="Harga" min="0" inputmode="numeric" />
+            <input class="p-price" type="number" placeholder="Bayar" min="0" inputmode="numeric" />
             <button class="del-btn" onclick="mRemoveRow(this)">×</button>
           </div>
         </div>
         <div style="padding:0 16px">
-          <button class="add-btn blue" onclick="mAddRow()">+ tambahin orang lagi</button>
+          <button class="add-btn blue" onclick="mAddRow()">+ tambahin nama lagi</button>
         </div>
         <div id="m-err" class="err hidden"></div>
       </div>
@@ -327,12 +327,12 @@
     </div>
 
     <div class="section">
-      <div class="section-label">Yang bayar duluan</div>
+      <div class="section-label">Pake uang siapa dulu</div>
       <div class="card">
         <div class="field-inner flex-col-gap">
           <div>
             <div class="field-label">Nama</div>
-            <input type="text" id="m-bayar-nama" placeholder="Siapa yang udah bayar duluan?" autocomplete="off" />
+            <input type="text" id="m-bayar-nama" placeholder="Baik banget sih kamu" autocomplete="off" />
           </div>
           <div>
             <div class="field-label">Bank / e-wallet</div>
@@ -398,7 +398,7 @@
     </div>
     <div class="th-tag">Mode patungan</div>
     <div class="th-title">Patungan<span>!</span></div>
-    <div class="th-sub">Itung dulu ya, hati tenang nggak ada utang</div>
+    <div class="th-sub">Itung dulu ya, biar adil nggak pake drama</div>
   </div>
   <div class="content">
 
@@ -443,7 +443,7 @@
             </div>
           </div>
           <div class="setting-row hidden" id="p-tax-row">
-            <label>Besaran pajak</label>
+            <label>Berapa persen?</label>
             <div class="tax-right">
               <input class="tax-num" type="number" id="p-tax-input" value="11" min="0" max="100" step="0.5" oninput="pUpdateTax()" inputmode="decimal" />
               <span class="tax-val pink" id="p-tax-label">11%</span>
@@ -482,7 +482,7 @@
     </div>
 
     <div class="section">
-      <div class="section-label pink">Yang bayar duluan</div>
+      <div class="section-label pink">Pake uang siapa tadi?</div>
       <div class="card">
         <div class="field-inner flex-col-gap">
           <div>
@@ -645,7 +645,7 @@
     msg += `*GRAND TOTAL: ${fmt(grandTotal)}*\n`;
     if (kasir > 0) { const diff = Math.abs(grandTotal - kasir); msg += diff < 500 ? '\nStruk kasir: cocok!\n' : `\nSelisih dari struk: ${fmt(diff)}\n`; }
     if (bayarNama) { msg += `\n─────────────────\n💳 *Transfer ke:*\nNama: *${bayarNama}*\n`; if (bayarBank) msg += `Bank: ${bayarBank}\n`; if (bayarRek) msg += `No. Rek: *${bayarRek}*\n`; }
-    msg += '\n_Itung dulu ya, hati tenang nggak ada utang!_';
+    msg += '\n_Dibayar ya, orangnya butuh uang buat bayar cicilan_';
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   }
 
@@ -711,7 +711,7 @@
     msg += `👥 Dibagi ${jumlah} orang = *${fmt(perOrang)} per orang*\n\n─────────────────\n*Yang harus bayar:*\n`;
     computed.forEach(c => { msg += `👤 ${c.name}: *${fmt(c.total)}*\n`; });
     if (bayarNama) { msg += `\n─────────────────\n💳 *Transfer ke:*\nNama: *${bayarNama}*\n`; if (bayarBank) msg += `Bank: ${bayarBank}\n`; if (bayarRek) msg += `No. Rek: *${bayarRek}*\n`; }
-    msg += '\n_Itung dulu ya, hati tenang nggak ada utang!_';
+    msg += '\n_Dibayar ya, orangnya butuh uang buat bayar cicilan_';
     window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
   }
 
